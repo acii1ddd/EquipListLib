@@ -14,7 +14,7 @@ public static class EquipListLib
         var json = JsonSerializer.Serialize(Items, 
             EquipmentItemJsonContext.Default.ListEquipmentItem);
         
-        return Marshal.StringToHGlobalUni(json);
+        return Marshal.StringToHGlobalAnsi(json);
     }
     
     static EquipListLib()
