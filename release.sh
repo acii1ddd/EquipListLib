@@ -2,6 +2,7 @@
 
 # git tag v
 # git push --tags
+# dotnet publish -c Release
 TAG="$1"
 if [[ -z "$TAG" ]]; then
   echo "Использование: ./release.sh. Введите параметр <TAG>"
@@ -9,8 +10,8 @@ if [[ -z "$TAG" ]]; then
 fi
 
 FILES=(
-"./EquipListLib/bin/Release/net9.0/linux-x64/native/EquipListLib.so" 
-"./EquipListLib/bin/Release/net9.0/linux-x64/native/EquipListLib.so.dbg" "README.md"
+"./EquipListLib/bin/Release/net9.0/linux-x64/publish/EquipListLib.so" 
+"./EquipListLib/bin/Release/net9.0/linux-x64/publish/EquipListLib.so.dbg" "README.md"
 )
 for file in "${FILES[@]}"; do
   if [[ ! -f "$file" ]]; then
