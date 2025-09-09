@@ -6,7 +6,7 @@ namespace EquipListLib;
 
 public static class EquipListLib
 {
-    private static readonly List<EquipmentItem> Items = [];
+    private static readonly IRepository _repository;
 
     [UnmanagedCallersOnly(EntryPoint = "get_all_json")]
     public static IntPtr GetAll()
@@ -16,8 +16,26 @@ public static class EquipListLib
         
         return Marshal.StringToHGlobalAnsi(json);
     }
+}
+
+internal interface IRepository
+{
+    public Task<List<EquipmentItem>> GetAllAsync();
     
-    static EquipListLib()
+    public Task<EquipmentItem?> GetByIdAsync(Guid id);
+    
+    public Task<Guid> CreateAsync(EquipmentItem item);
+    
+    public Task UpdateAsync(EquipmentItem item);
+    
+    public Task DeleteAsync(Guid id);
+}
+
+public class EquipRepository : IRepository
+{
+    private static readonly List<EquipmentItem> Items = [];
+    
+    static EquipRepository()
     {
         Items.Add(new EquipmentItem
         {
@@ -46,7 +64,48 @@ public static class EquipListLib
             UnitPrice = 650.00m,
         });
     }
+    
+    public Task<List<EquipmentItem>> GetAllAsync()
+    {
+        return Task.FromResult(Items);
+    }
 
+    public Task<EquipmentItem?> GetByIdAsync(Guid id)
+    {
+        return Task.FromResult(Items.Find(x => x.Id == id));
+    }
+
+    public Task<Guid> CreateAsync(EquipmentItem item)
+    {
+        Items.Add(item);
+        return Task.FromResult(item.Id);
+    }
+
+    public Task UpdateAsync(EquipmentItem item)
+    {
+        var idx = Items.FindIndex(x => x.Id == item.Id);
+
+        if (idx == -1)
+        {
+            throw new Exception($"Equipment item with id {item.Id} was not found");
+        }
+        
+        Items[idx] = item;
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(Guid id)
+    {
+        var item = Items.Find(x => x.Id == id);
+
+        if (item is null)
+        {
+            throw new Exception($"Equipment item with id {id} was not found");
+        }
+        
+        Items.Remove(item);
+        return Task.CompletedTask;
+    }
 }
 
 [JsonSerializable(typeof(List<EquipmentItem>))]
